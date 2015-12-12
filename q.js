@@ -829,6 +829,18 @@ Promise.prototype.then = function (fulfilled, rejected, progressed) {
     var done = false;   // ensure the untrusted promise makes at most a
                         // single call to one of the callbacks
 
+    if (typeof process === 'object' && typeof process.emit === 'function' && process.domain) {
+        if (fulfilled) {
+            fulfilled = typeof fulfilled === "function" ? process.domain.bind(fulfilled) : fulfilled;
+        }
+        if (rejected) {
+            rejected = typeof rejected === "function" ? process.domain.bind(rejected) : rejected;
+        }
+        if (progressed) {
+            progressed = typeof progressed === "function" ? process.domain.bind(progressed) : progressed;
+        }
+    }
+
     function _fulfilled(value) {
         try {
             return typeof fulfilled === "function" ? fulfilled(value) : value;
